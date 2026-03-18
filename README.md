@@ -10,26 +10,6 @@ WellConnect is a mental health web platform built for the people. It connects in
 
 ---
 
-## Screenshots
-
-### Landing Page
-![Landing Page](public/images/hero-mockup.svg)
-
-### User Dashboard
-![User Dashboard](public/images/dashboard-mockup.svg)
-
-### Community Hub
-![Community Feed](public/images/community-feed-mockup.svg)
-
-### Therapist Portal
-![Therapist Portal](public/images/therapist-portal-mockup.svg)
-
----
-
-## Architecture Overview
-
-![Architecture Diagram](public/images/architecture-diagram.svg)
-
 ---
 
 ## Features
@@ -217,10 +197,10 @@ WellConnect integrates Rwanda's mental health crisis resources directly in the U
 
 ---
 
-## License
+## Indo
 
-This project is licensed under the **ISC License**.
+ This part of the project was worked on Kelvin and Chibueze of the WellConnect team.
 
 ---
 
-*Built with care for mental health accessibility in Rwanda and beyond.*
+*Built with care for mental health accessibility in Rwanda.*

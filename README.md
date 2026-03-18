@@ -197,7 +197,7 @@ WellConnect integrates Rwanda's mental health crisis resources directly in the U
 
 ---
 
-## Indo
+## Info
 
  This part of the project was worked on Kelvin and Chibueze of the WellConnect team.
 

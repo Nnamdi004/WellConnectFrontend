@@ -1,20 +1,212 @@
 "use client";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import {
+  Activity,
+  Users,
+  BarChart2,
+  MessageCircle,
+  ArrowRight,
+  CheckCircle2,
+  TrendingUp,
+  Heart,
+  Sparkles,
+} from "lucide-react";
+
+function PhoneMockup() {
+  return (
+    <div className="relative flex justify-center md:justify-end">
+      {/* Glow backdrop */}
+      <div className="absolute inset-0 bg-[#10B981] opacity-10 blur-3xl rounded-full scale-75 translate-y-8"></div>
+
+      {/* Phone frame */}
+      <div className="relative w-64 bg-gradient-to-b from-[#e6fdf4] to-[#ccfbe8] rounded-[2.5rem] p-2.5 shadow-2xl border border-[#a7f3d0] z-10">
+        <div className="bg-white rounded-[2rem] overflow-hidden">
+          {/* Status bar */}
+          <div className="bg-[#0D5C3D] px-4 py-3 flex items-center justify-between">
+            <span className="text-white text-xs font-bold tracking-wide">WellConnect</span>
+            <div className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-[#6EE7B7] rounded-full"></div>
+              <div className="w-1.5 h-1.5 bg-[#6EE7B7] rounded-full"></div>
+              <div className="w-1 h-1 bg-[#34d399] rounded-full opacity-60"></div>
+            </div>
+          </div>
+
+          {/* App body */}
+          <div className="bg-gray-50 px-3 py-3 space-y-2.5 min-h-[340px]">
+            {/* Greeting */}
+            <div className="pt-1">
+              <p className="text-gray-400 text-[10px] font-medium uppercase tracking-widest">Good morning</p>
+              <p className="text-gray-900 text-sm font-bold leading-tight">How are you today?</p>
+            </div>
+
+            {/* Mood card */}
+            <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Mood Today</span>
+                <span className="text-base">😊</span>
+              </div>
+              {/* Bar chart */}
+              <div className="flex items-end gap-[3px] h-10">
+                {[40, 60, 50, 80, 70, 90, 80].map((h, i) => (
+                  <div
+                    key={i}
+                    className={`flex-1 rounded-t-sm transition-all ${i === 6 ? "bg-[#10B981]" : "bg-[#d1fae5]"}`}
+                    style={{ height: `${h}%` }}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-between mt-1.5">
+                {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+                  <span key={i} className="text-[9px] text-gray-300 flex-1 text-center font-medium">{d}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Session card */}
+            <div className="bg-[#0D5C3D] rounded-2xl p-3">
+              <p className="text-[#6EE7B7] text-[10px] font-bold uppercase tracking-widest mb-1">Next Session</p>
+              <p className="text-white text-sm font-bold">Dr. Amara Nkosi</p>
+              <p className="text-[#A7F3D0] text-[11px]">Tomorrow · 10:00 AM</p>
+            </div>
+
+            {/* Community pulse */}
+            <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+              <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">Community</p>
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-1.5">
+                  {["#F87171", "#60A5FA", "#FBBF24", "#A78BFA"].map((c, i) => (
+                    <div key={i} className="w-5 h-5 rounded-full border-2 border-white" style={{ backgroundColor: c }} />
+                  ))}
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium">14 shared today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Floating badge — top right */}
+      <div className="absolute top-2 -right-6 bg-white rounded-2xl px-3 py-2 shadow-lg border border-gray-100 flex items-center gap-2 z-20">
+        <div className="w-6 h-6 bg-[#ECFDF5] rounded-full flex items-center justify-center">
+          <CheckCircle2 size={13} className="text-[#10B981]" />
+        </div>
+        <span className="text-xs font-bold text-gray-700">Therapist Matched!</span>
+      </div>
+
+      {/* Floating badge — bottom left */}
+      <div className="absolute -bottom-2 -left-10 bg-white rounded-2xl px-3 py-2.5 shadow-lg border border-gray-100 z-20">
+        <p className="text-[10px] text-gray-400 font-medium">Mood streak</p>
+        <div className="flex items-center gap-1">
+          <TrendingUp size={13} className="text-[#10B981]" />
+          <p className="text-sm font-extrabold text-[#10B981]">7-day streak</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const features = [
+  {
+    icon: <Activity size={24} className="text-[#10B981]" />,
+    title: "Therapist Matching",
+    desc: "Get matched with a verified therapist based on your intake assessment. All professionals are vetted by our team.",
+    link: "/how-it-works",
+    cta: "See how it works",
+  },
+  {
+    icon: <Users size={24} className="text-[#10B981]" />,
+    title: "Peer Support",
+    desc: "Read and share stories anonymously. Give and receive support from a community that truly understands.",
+    link: "/feed",
+    cta: "Browse stories",
+  },
+  {
+    icon: <BarChart2 size={24} className="text-[#10B981]" />,
+    title: "Mood Tracking",
+    desc: "Log your mood daily and watch your progress on a chart. Share your history with your therapist.",
+    link: "/mood-tracking",
+    cta: "See how it works",
+  },
+  {
+    icon: <MessageCircle size={24} className="text-[#10B981]" />,
+    title: "Secure Chat",
+    desc: "Message your therapist through our encrypted in-app chat. All sessions are private and confidential.",
+    link: "/register",
+    cta: "Get started",
+  },
+];
+
+function AboutIllustration() {
+  return (
+    <div className="relative w-full">
+      {/* Main card */}
+      <div className="relative bg-gradient-to-br from-[#ECFDF5] to-[#d1fae5] rounded-3xl p-8 overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#10B981] opacity-10"></div>
+        <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-[#059669] opacity-10"></div>
+
+        {/* People icons row */}
+        <div className="flex justify-center gap-5 mb-6">
+          {[
+            { bg: "#F87171", delay: "0ms" },
+            { bg: "#60A5FA", delay: "100ms" },
+            { bg: "#FBBF24", delay: "200ms" },
+            { bg: "#A78BFA", delay: "300ms" },
+            { bg: "#34D399", delay: "400ms" },
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <div className="w-12 h-12 rounded-full border-3 border-white shadow-md flex items-center justify-center" style={{ backgroundColor: item.bg }}>
+                <svg width="20" height="20" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Connection lines SVG */}
+        <svg viewBox="0 0 320 40" className="w-full mb-6 opacity-30" fill="none">
+          <path d="M32 0 Q160 40 288 0" stroke="#10B981" strokeWidth="2" strokeDasharray="4 4"/>
+          <path d="M80 0 Q160 30 240 0" stroke="#10B981" strokeWidth="1.5" strokeDasharray="3 3"/>
+        </svg>
+
+        {/* Stats row */}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { value: "2K+", label: "Members", icon: <Users size={16} className="text-[#10B981]" /> },
+            { value: "98%", label: "Feel Supported", icon: <Heart size={16} className="text-[#10B981]" /> },
+            { value: "50+", label: "Therapists", icon: <Sparkles size={16} className="text-[#10B981]" /> },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-white rounded-2xl p-3 text-center shadow-sm">
+              <div className="flex justify-center mb-1">{stat.icon}</div>
+              <p className="text-lg font-extrabold text-gray-900">{stat.value}</p>
+              <p className="text-[11px] text-gray-500 font-medium">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Decorative floating dot */}
+      <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-[#ECFDF5] rounded-full -z-10 border-4 border-white"></div>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white" style={{ fontFamily: "'Segoe UI', sans-serif" }}>
+    <main className="min-h-screen bg-white">
       <Navbar />
 
       {/* HERO */}
       <section id="home" className="flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-16 max-w-7xl mx-auto gap-10">
         <div className="flex-1 max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ECFDF5] text-[#10B981] text-xs font-semibold rounded-full mb-6">
-            <span className="w-2 h-2 bg-[#10B981] rounded-full"></span>
+            <span className="w-2 h-2 bg-[#10B981] rounded-full animate-pulse"></span>
             Now available in Rwanda
           </div>
-          <h1 className="text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+          <h1 className="text-5xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">
             Mental Health<br />Support,<br />
             <span className="text-[#10B981]">Reimagined.</span>
           </h1>
@@ -24,12 +216,10 @@ export default function Home() {
           <div className="flex items-center gap-4 mb-10">
             <Link
               href="/register"
-              className="px-7 py-3.5 bg-[#10B981] text-white font-semibold rounded-full hover:bg-[#059669] active:scale-95 transition-all flex items-center gap-2"
+              className="px-7 py-3.5 bg-[#10B981] text-white font-semibold rounded-full hover:bg-[#059669] active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-emerald-200"
             >
               Get Started Free
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <ArrowRight size={16} />
             </Link>
             <a
               href="#about"
@@ -40,37 +230,16 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
-              {["#F87171","#60A5FA","#FBBF24","#A78BFA"].map((color, i) => (
-                <div key={i} className="w-8 h-8 rounded-full border-2 border-white" style={{ backgroundColor: color }}></div>
+              {["#F87171", "#60A5FA", "#FBBF24", "#A78BFA"].map((color, i) => (
+                <div key={i} className="w-8 h-8 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: color }}></div>
               ))}
             </div>
-            <span className="text-gray-500 text-sm">Join 2,000+ users today</span>
+            <span className="text-gray-500 text-sm font-medium">Join 2,000+ users today</span>
           </div>
         </div>
 
-        <div className="flex-1 flex justify-center md:justify-end">
-          <div className="relative w-80 h-96 rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-b from-[#6EE7B7] to-[#059669]">
-            <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-white opacity-10 -translate-y-10 translate-x-10"></div>
-            <div className="absolute bottom-20 left-0 w-32 h-32 rounded-full bg-white opacity-10 translate-y-10 -translate-x-10"></div>
-            <div className="absolute inset-0 flex items-center justify-center pb-16">
-              <div className="text-center text-white opacity-40">
-                <svg width="72" height="72" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24" className="mx-auto">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </div>
-            <div className="absolute bottom-5 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex items-center gap-3 shadow-lg">
-              <div className="w-9 h-9 bg-[#ECFDF5] rounded-full flex items-center justify-center flex-shrink-0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
-                </svg>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">DAILY MOOD</p>
-                <p className="text-sm font-bold text-gray-900">Feeling hopeful today</p>
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 flex justify-center md:justify-end pr-8">
+          <PhoneMockup />
         </div>
       </section>
 
@@ -79,43 +248,14 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-[#10B981] text-sm font-bold uppercase tracking-widest mb-3">OUR ECOSYSTEM</p>
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">Comprehensive Care for Your Mind</h2>
+            <h2 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Comprehensive Care for Your Mind</h2>
             <p className="text-gray-500 text-lg max-w-2xl mx-auto">
               We have built a holistic platform that adapts to your needs.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              {
-                icon: <svg width="26" height="26" fill="none" stroke="#10B981" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-                title: "Therapist Matching",
-                desc: "Get matched with a verified therapist based on your intake assessment. All professionals are vetted by our team.",
-                link: "/how-it-works",
-                cta: "See how it works",
-              },
-              {
-                icon: <svg width="26" height="26" fill="none" stroke="#10B981" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-                title: "Peer Support",
-                desc: "Read and share stories anonymously. Give and receive support from a community that truly understands.",
-                link: "/feed",
-                cta: "Browse stories",
-              },
-              {
-                icon: <svg width="26" height="26" fill="none" stroke="#10B981" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-                title: "Mood Tracking",
-                desc: "Log your mood daily and watch your progress on a chart. Share your history with your therapist.",
-                link: "/mood-tracking",
-cta: "See how it works",
-              },
-              {
-                icon: <svg width="26" height="26" fill="none" stroke="#10B981" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-                title: "Secure Chat",
-                desc: "Message your therapist through our encrypted in-app chat. All sessions are private and confidential.",
-                link: "/register",
-                cta: "Get started",
-              },
-            ].map((f) => (
-              <div key={f.title} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all flex flex-col">
+            {features.map((f) => (
+              <div key={f.title} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all flex flex-col border border-gray-50">
                 <div className="w-14 h-14 bg-[#ECFDF5] rounded-2xl flex items-center justify-center mb-5 flex-shrink-0">
                   {f.icon}
                 </div>
@@ -126,9 +266,7 @@ cta: "See how it works",
                   className="mt-4 text-sm font-semibold text-[#10B981] hover:underline inline-flex items-center gap-1"
                 >
                   {f.cta}
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <ArrowRight size={13} />
                 </Link>
               </div>
             ))}
@@ -139,22 +277,14 @@ cta: "See how it works",
       {/* ABOUT */}
       <section id="about" className="py-20 px-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-14">
-          <div className="flex-1 relative">
-            <div className="w-full h-80 bg-gray-100 rounded-3xl flex items-center justify-center">
-              <div className="text-center text-gray-300">
-                <svg width="64" height="64" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24" className="mx-auto mb-2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <p className="text-sm">Community photo</p>
-              </div>
-            </div>
-            <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-[#ECFDF5] rounded-full -z-10"></div>
+          <div className="flex-1">
+            <AboutIllustration />
           </div>
           <div className="flex-1 max-w-xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ECFDF5] text-[#10B981] text-xs font-semibold rounded-full mb-4">
               Our Mission
             </div>
-            <h2 className="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+            <h2 className="text-4xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">
               Breaking Barriers to Mental Healthcare in Rwanda
             </h2>
             <p className="text-gray-500 leading-relaxed mb-4">
@@ -164,12 +294,10 @@ cta: "See how it works",
               WellConnect is more than an app. It is a movement. By combining technology with human connection, we are democratizing access to care.
             </p>
             <div className="space-y-3">
-              {["Culturally relevant therapy matching","Anonymous and safe peer environments","Data-driven insights for better treatment"].map((item) => (
+              {["Culturally relevant therapy matching", "Anonymous and safe peer environments", "Data-driven insights for better treatment"].map((item) => (
                 <div key={item} className="flex items-center gap-3">
                   <div className="w-6 h-6 bg-[#ECFDF5] rounded-full flex items-center justify-center flex-shrink-0 border-2 border-[#10B981]">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
+                    <CheckCircle2 size={12} className="text-[#10B981]" />
                   </div>
                   <span className="text-gray-700 text-sm font-medium">{item}</span>
                 </div>
@@ -183,7 +311,11 @@ cta: "See how it works",
       <section className="bg-[#0D5C3D] py-20 px-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-14">
           <div className="flex-1 max-w-md">
-            <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 text-[#6EE7B7] text-xs font-semibold rounded-full mb-5">
+              <Sparkles size={12} />
+              Dashboard Preview
+            </div>
+            <h2 className="text-4xl font-extrabold text-white leading-tight mb-4 tracking-tight">
               Your Personal Mental Health Dashboard
             </h2>
             <p className="text-[#6EE7B7] leading-relaxed mb-8">
@@ -191,26 +323,32 @@ cta: "See how it works",
             </p>
             <Link
               href="/register"
-              className="inline-block px-7 py-3.5 bg-white text-[#0D5C3D] font-bold rounded-full hover:bg-gray-100 active:scale-95 transition-all"
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-[#0D5C3D] font-bold rounded-full hover:bg-gray-100 active:scale-95 transition-all"
             >
               Create Free Account
+              <ArrowRight size={16} />
             </Link>
           </div>
           <div className="flex-1 flex justify-center">
-            <div className="bg-[#1a1a2e] rounded-2xl p-4 w-full max-w-md shadow-2xl">
+            <div className="bg-[#1a1a2e] rounded-2xl p-4 w-full max-w-md shadow-2xl border border-white/5">
               <div className="flex gap-1.5 mb-3">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                 <div className="w-3 h-3 rounded-full bg-green-400"></div>
               </div>
-              <div className="bg-[#0f0f1a] rounded-xl p-5 h-36 flex items-center justify-center mb-3">
-                <p className="text-gray-600 text-sm text-center">Mood chart visualization</p>
+              {/* Mock chart */}
+              <div className="bg-[#0f0f1a] rounded-xl p-4 h-36 mb-3 flex items-end gap-2 px-5">
+                {[5, 7, 4, 8, 6, 9, 8].map((h, i) => (
+                  <div
+                    key={i}
+                    className={`flex-1 rounded-t-md ${i === 5 ? "bg-[#10B981]" : "bg-[#10B981]/30"}`}
+                    style={{ height: `${h * 10}%` }}
+                  />
+                ))}
               </div>
               <div className="bg-[#1e3a5f] rounded-xl px-4 py-3 flex items-start gap-3">
                 <div className="w-8 h-8 bg-[#10B981] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <MessageCircle size={14} className="text-white" />
                 </div>
                 <p className="text-white text-sm leading-relaxed">
                   Hello. I noticed your mood has been low today. Would you like to try a breathing exercise?
@@ -227,7 +365,11 @@ cta: "See how it works",
           <div className="bg-gradient-to-r from-[#10B981] to-[#059669] rounded-3xl px-10 py-16 text-center relative overflow-hidden">
             <div className="absolute top-0 left-0 w-48 h-48 rounded-full bg-white opacity-10 -translate-x-20 -translate-y-20"></div>
             <div className="absolute bottom-0 right-0 w-56 h-56 rounded-full bg-white opacity-10 translate-x-16 translate-y-16"></div>
-            <h2 className="text-4xl font-extrabold text-white mb-4 relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 text-white text-xs font-semibold rounded-full mb-5 relative z-10">
+              <Heart size={12} />
+              Join Our Community
+            </div>
+            <h2 className="text-4xl font-extrabold text-white mb-4 relative z-10 tracking-tight">
               Start Your Wellness Journey Today
             </h2>
             <p className="text-[#ECFDF5] text-lg mb-8 relative z-10">
@@ -235,9 +377,10 @@ cta: "See how it works",
             </p>
             <Link
               href="/register"
-              className="inline-block px-10 py-4 bg-white text-[#10B981] font-bold rounded-full hover:bg-gray-50 active:scale-95 transition-all relative z-10 text-lg"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-white text-[#10B981] font-bold rounded-full hover:bg-gray-50 active:scale-95 transition-all relative z-10 text-lg shadow-xl"
             >
               Create Free Account
+              <ArrowRight size={18} />
             </Link>
           </div>
         </div>
@@ -247,11 +390,13 @@ cta: "See how it works",
       <footer id="contact" className="bg-white border-t border-gray-100 py-14 px-8">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 bg-[#10B981] rounded-xl flex items-center justify-center">
-                <span className="text-white font-black text-lg">W</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">WellConnect</span>
+            <div className="flex items-center gap-2.5 mb-4">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <rect width="36" height="36" rx="10" fill="#10B981"/>
+                <path d="M18 27s-9-5.5-9-12a6 6 0 0 1 9-5.196A6 6 0 0 1 27 15c0 6.5-9 12-9 12z" fill="white" opacity="0.9"/>
+                <path d="M13 18.5 l2.5 2.5 l5-6" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-xl font-bold text-gray-900 tracking-tight">WellConnect</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed">
               Empowering mental wellness through technology and community connection in Rwanda.

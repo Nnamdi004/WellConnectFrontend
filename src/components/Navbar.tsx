@@ -15,6 +15,7 @@ import {
   BookOpen,
   HelpCircle,
   PhoneCall,
+  Settings,
 } from "lucide-react";
 
 function WellConnectLogo() {
@@ -197,16 +198,16 @@ export default function Navbar() {
 
         {tokenType === "user" && (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#ECFDF5] rounded-full flex items-center justify-center">
+            <Link href="/settings" className="w-8 h-8 bg-[#ECFDF5] rounded-full flex items-center justify-center hover:bg-[#d1fae5] transition-colors" title="Settings">
               <UserCircle size={18} className="text-[#10B981]" />
-            </div>
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-red-500 transition-colors"
+            </Link>
+            <Link
+              href="/settings"
+              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${isActive("/settings")}`}
             >
-              <LogOut size={15} />
-              Sign Out
-            </button>
+              <Settings size={15} />
+              Settings
+            </Link>
           </div>
         )}
 

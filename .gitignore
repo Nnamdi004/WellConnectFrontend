@@ -9,11 +9,10 @@ out/
 .env.local
 .env.*.local
 
+
 # OS files
 .DS_Store
 Thumbs.db
 
 # Debug logs
 npm-debug.log*
-.env.local
-

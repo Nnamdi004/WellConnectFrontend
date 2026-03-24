@@ -19,9 +19,21 @@ const highlights = [
   { icon: <TrendingUp size={18} className="text-[#6EE7B7]" />, text: "Track your mental wellness journey" },
 ];
 
+// Creates a minimal mock JWT so token-parsing code (e.g. settings page) works offline
+function mockJwt(payload: object) {
+  const h = btoa(JSON.stringify({ alg: "none" }));
+  const p = btoa(JSON.stringify(payload));
+  return `${h}.${p}.mock`;
+}
+
 export default function LoginPage() {
   const handleGoogleLogin = () => {
     window.location.href = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081") + "/oauth2/authorization/google";
+  };
+
+  const handleDemoLogin = () => {
+    localStorage.setItem("token", mockJwt({ sub: "demo_user", email: "user@demo.wellconnect.rw" }));
+    window.location.href = "/dashboard";
   };
 
   return (
@@ -94,7 +106,7 @@ export default function LoginPage() {
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">For Community Members</p>
             <button
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-all"
+              className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-all mb-3"
             >
               <svg width="20" height="20" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -103,6 +115,19 @@ export default function LoginPage() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
               Continue with Google
+            </button>
+
+            {/* Demo login — remove once backend is live */}
+            <div className="relative my-3">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100" /></div>
+              <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-gray-400">or</span></div>
+            </div>
+            <button
+              onClick={handleDemoLogin}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl text-[#065F46] font-semibold hover:bg-[#d1fae5] active:scale-95 transition-all text-sm"
+            >
+              <span className="w-2 h-2 bg-[#10B981] rounded-full"></span>
+              Demo — Sign in as User
             </button>
             <p className="text-xs text-gray-400 text-center mt-4 leading-relaxed">
               By signing in you agree to keep this space safe and respectful for everyone.

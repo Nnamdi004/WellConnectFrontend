@@ -2,6 +2,15 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const DEMO_EMAIL = "therapist@demo.com";
+const DEMO_PASSWORD = "demo123";
+
+function mockJwt(payload: object) {
+  const h = btoa(JSON.stringify({ alg: "none" }));
+  const p = btoa(JSON.stringify(payload));
+  return `${h}.${p}.mock`;
+}
+
 export default function TherapistLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +21,14 @@ export default function TherapistLoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    // Demo credentials — bypass backend
+    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
+      localStorage.setItem("therapist_token", mockJwt({ sub: "Dr. Demo Therapist", email: DEMO_EMAIL }));
+      window.location.href = "/therapist";
+      return;
+    }
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081"}/api/auth/therapist/login`,
@@ -39,11 +56,13 @@ export default function TherapistLoginPage() {
     <main className="min-h-screen bg-[#EEF2F0] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <Link href="/" className="flex items-center justify-center gap-2 mb-3">
-            <div className="w-9 h-9 bg-[#10B981] rounded-xl flex items-center justify-center">
-              <span className="text-white font-black text-lg">W</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">WellConnect</span>
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-3">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <rect width="36" height="36" rx="10" fill="#10B981"/>
+              <path d="M18 27s-9-5.5-9-12a6 6 0 0 1 9-5.196A6 6 0 0 1 27 15c0 6.5-9 12-9 12z" fill="white" opacity="0.9"/>
+              <path d="M13 18.5 l2.5 2.5 l5-6" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">WellConnect</span>
           </Link>
           <p className="text-gray-500 text-sm">Professional Portal</p>
         </div>
@@ -95,6 +114,13 @@ export default function TherapistLoginPage() {
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
+
+          {/* Demo credentials hint */}
+          <div className="mt-5 p-4 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl">
+            <p className="text-xs font-bold text-[#065F46] mb-1.5">Demo credentials</p>
+            <p className="text-xs text-[#065F46]">Email: <span className="font-mono font-semibold">{DEMO_EMAIL}</span></p>
+            <p className="text-xs text-[#065F46]">Password: <span className="font-mono font-semibold">{DEMO_PASSWORD}</span></p>
+          </div>
         </div>
         <div className="text-center mt-6 space-y-2">
           <p className="text-sm text-gray-500">

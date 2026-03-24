@@ -2,6 +2,15 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const DEMO_EMAIL = "admin@wellconnect.com";
+const DEMO_PASSWORD = "admin123";
+
+function mockJwt(payload: object) {
+  const h = btoa(JSON.stringify({ alg: "none" }));
+  const p = btoa(JSON.stringify(payload));
+  return `${h}.${p}.mock`;
+}
+
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +21,14 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    // Demo credentials — bypass backend
+    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
+      localStorage.setItem("admin_token", mockJwt({ sub: "admin", email: DEMO_EMAIL }));
+      window.location.href = "/admin";
+      return;
+    }
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081"}/api/auth/admin/login`,
@@ -93,10 +110,10 @@ export default function AdminLoginPage() {
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
-          <div className="mt-6 p-4 bg-gray-700/50 rounded-xl">
-            <p className="text-xs text-gray-400 font-medium mb-1">Default credentials</p>
-            <p className="text-xs text-gray-300">Email: admin@wellconnect.com</p>
-            <p className="text-xs text-gray-300">Password: admin123</p>
+          <div className="mt-5 p-4 bg-gray-700/50 rounded-xl">
+            <p className="text-xs text-gray-400 font-bold mb-1.5">Demo credentials</p>
+            <p className="text-xs text-gray-300">Email: <span className="font-mono font-semibold text-white">{DEMO_EMAIL}</span></p>
+            <p className="text-xs text-gray-300">Password: <span className="font-mono font-semibold text-white">{DEMO_PASSWORD}</span></p>
           </div>
         </div>
         <div className="text-center mt-6">

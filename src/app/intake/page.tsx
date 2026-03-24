@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const PHQ9 = ["Little interest or pleasure in doing things","Feeling down, depressed, or hopeless","Trouble falling or staying asleep, or sleeping too much","Feeling tired or having little energy","Poor appetite or overeating","Feeling bad about yourself or that you are a failure","Trouble concentrating on things","Moving or speaking so slowly others noticed, or being fidgety and restless","Thoughts that you would be better off dead or of hurting yourself"];
@@ -15,10 +15,15 @@ function severity(score: number, max: number) {
 }
 
 export default function IntakePage() {
-  const [step, setStep] = useState<"welcome"|"phq9"|"gad7"|"results">("welcome");
+  const [step, setStep] = useState<"auth-gate"|"welcome"|"phq9"|"gad7"|"results">("auth-gate");
   const [phq9, setPhq9] = useState<Record<number,number>>({});
   const [gad7, setGad7] = useState<Record<number,number>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) setStep("welcome");
+  }, []);
   const phq9Score = Object.values(phq9).reduce((a,b) => a+b, 0);
   const gad7Score = Object.values(gad7).reduce((a,b) => a+b, 0);
 
@@ -39,11 +44,90 @@ export default function IntakePage() {
     } catch { } finally { setSubmitting(false); setStep("results"); }
   };
 
+  if (step === "auth-gate") return (
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="max-w-lg w-full">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <rect width="36" height="36" rx="10" fill="#10B981"/>
+              <path d="M18 27s-9-5.5-9-12a6 6 0 0 1 9-5.196A6 6 0 0 1 27 15c0 6.5-9 12-9 12z" fill="white" opacity="0.9"/>
+              <path d="M13 18.5 l2.5 2.5 l5-6" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">WellConnect</span>
+          </Link>
+        </div>
+
+        {/* Gate card */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-5">
+          {/* Top banner */}
+          <div className="bg-gradient-to-r from-[#0D5C3D] to-[#059669] px-8 py-8 text-center">
+            <div className="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg width="32" height="32" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h1 className="text-2xl font-extrabold text-white tracking-tight mb-2">Mental Health Assessment</h1>
+            <p className="text-[#A7F3D0] text-sm leading-relaxed">A free, confidential questionnaire to help us match you with the right support.</p>
+          </div>
+
+          {/* Body */}
+          <div className="px-8 py-7">
+            <p className="text-gray-700 font-semibold text-sm mb-4">Why do I need an account?</p>
+            <div className="space-y-3 mb-7">
+              {[
+                { icon: "🔒", text: "Your results are saved securely to your profile" },
+                { icon: "🎯", text: "We use your results to match you with the right therapist" },
+                { icon: "📈", text: "Track how your scores change over time" },
+                { icon: "🤝", text: "Share your results with your therapist directly" },
+              ].map(item => (
+                <div key={item.text} className="flex items-start gap-3">
+                  <span className="text-lg leading-none mt-0.5">{item.icon}</span>
+                  <p className="text-sm text-gray-600">{item.text}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/register"
+                className="w-full py-3.5 bg-[#10B981] text-white font-bold rounded-2xl hover:bg-[#059669] active:scale-95 transition-all text-center text-sm"
+              >
+                Create a Free Account
+              </Link>
+              <Link
+                href="/login"
+                className="w-full py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-2xl hover:border-[#10B981] hover:text-[#10B981] active:scale-95 transition-all text-center text-sm"
+              >
+                Sign In to Existing Account
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400">
+          Already signed in?{" "}
+          <button onClick={() => setStep("welcome")} className="text-[#10B981] font-semibold hover:underline">
+            Continue to assessment
+          </button>
+        </p>
+      </div>
+    </main>
+  );
+
   if (step === "welcome") return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-lg w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="flex items-center justify-center gap-2 mb-6"><div className="w-9 h-9 bg-[#10B981] rounded-xl flex items-center justify-center"><span className="text-white font-black text-lg">W</span></div><span className="text-xl font-bold text-gray-900">WellConnect</span></Link>
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <rect width="36" height="36" rx="10" fill="#10B981"/>
+              <path d="M18 27s-9-5.5-9-12a6 6 0 0 1 9-5.196A6 6 0 0 1 27 15c0 6.5-9 12-9 12z" fill="white" opacity="0.9"/>
+              <path d="M13 18.5 l2.5 2.5 l5-6" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">WellConnect</span>
+          </Link>
           <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Welcome. Let us get to know you.</h1>
           <p className="text-gray-500 leading-relaxed">This short questionnaire helps us understand how you have been feeling so we can connect you with the right support. It takes about 3 minutes.</p>
         </div>

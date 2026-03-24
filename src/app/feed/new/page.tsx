@@ -2,8 +2,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-type Category = { id: number; name: string };
 type Tag = { id: number; name: string };
+
+const CATEGORIES = [
+  { id: 1, name: "Anxiety" },
+  { id: 2, name: "Depression" },
+  { id: 3, name: "Grief & Loss" },
+  { id: 4, name: "Trauma & PTSD" },
+  { id: 5, name: "Stress & Burnout" },
+  { id: 6, name: "Relationships" },
+];
 
 export default function NewStoryPage() {
   const [title, setTitle] = useState("");
@@ -11,16 +19,14 @@ export default function NewStoryPage() {
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [isAnonymous, setIsAnonymous] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081";
 
   useEffect(() => {
-    fetch(`${BASE}/api/categories`).then(r => r.json()).then(setCategories).catch(() => {});
-    fetch(`${BASE}/api/tags`).then(r => r.json()).then(setTags).catch(() => {});
+    fetch(`${BASE}/api/stories/tags`).then(r => r.json()).then(setTags).catch(() => {});
   }, [BASE]);
 
   const toggleTag = (id: number) => setSelectedTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
@@ -54,7 +60,14 @@ export default function NewStoryPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2"><div className="w-8 h-8 bg-[#10B981] rounded-lg flex items-center justify-center"><span className="text-white font-black">W</span></div><span className="font-bold text-gray-900">WellConnect</span></Link>
+        <Link href="/" className="flex items-center gap-2.5">
+          <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="10" fill="#10B981"/>
+            <path d="M18 27s-9-5.5-9-12a6 6 0 0 1 9-5.196A6 6 0 0 1 27 15c0 6.5-9 12-9 12z" fill="white" opacity="0.9"/>
+            <path d="M13 18.5 l2.5 2.5 l5-6" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="font-bold text-gray-900 tracking-tight">WellConnect</span>
+        </Link>
         <Link href="/feed" className="text-sm text-gray-500 hover:text-gray-900">Cancel</Link>
       </nav>
       <div className="max-w-2xl mx-auto px-4 py-10">
@@ -62,7 +75,22 @@ export default function NewStoryPage() {
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
           {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">{error}</div>}
           <div><label className="block text-sm font-semibold text-gray-700 mb-1">Title</label><input type="text" value={title} onChange={e => setTitle(e.target.value)} required placeholder="Give your story a title" className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#10B981] bg-gray-50" /></div>
-          <div><label className="block text-sm font-semibold text-gray-700 mb-1">Category</label><select value={categoryId ?? ""} onChange={e => setCategoryId(Number(e.target.value))} required className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#10B981] bg-gray-50 text-gray-600"><option value="">Select a category</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Category <span className="text-red-400">*</span>
+            </label>
+            <select
+              value={categoryId ?? ""}
+              onChange={e => setCategoryId(Number(e.target.value))}
+              required
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#10B981] bg-gray-50 text-gray-700"
+            >
+              <option value="" disabled>Select a mental health topic...</option>
+              {CATEGORIES.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
           <div><label className="block text-sm font-semibold text-gray-700 mb-1">Your Story</label><textarea value={content} onChange={e => setContent(e.target.value)} required rows={8} placeholder="Write your story here. Take your time. This is your space." className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#10B981] bg-gray-50 resize-none leading-relaxed" /><p className="text-xs text-gray-400 mt-1 text-right">{content.length} characters</p></div>
           {tags.length > 0 && <div><label className="block text-sm font-semibold text-gray-700 mb-2">Tags <span className="text-gray-400 font-normal">(optional)</span></label><div className="flex flex-wrap gap-2">{tags.map(tag => <button key={tag.id} type="button" onClick={() => toggleTag(tag.id)} className={`px-3 py-1 rounded-full text-xs border transition-colors ${selectedTags.includes(tag.id) ? "bg-[#10B981] text-white border-[#10B981]" : "border-gray-200 text-gray-500 hover:border-[#10B981]"}`}>#{tag.name}</button>)}</div></div>}
           <div className="flex items-center justify-between py-4 border-t border-gray-50">

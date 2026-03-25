@@ -20,6 +20,8 @@ export default function AdminDashboardPage() {
   const [provisionError, setProvisionError] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newTagName, setNewTagName] = useState("");
+  const [users, setUsers] = useState<ManagedUser[]>([]);
+  const [userSearch, setUserSearch] = useState("");
   const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081";
   const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") || "" : "";
 
@@ -98,6 +100,45 @@ export default function AdminDashboardPage() {
 
   const pendingReports = reports.filter(r => r.status === "PENDING").length;
 
+  const handleSuspendUser = async (userId: number) => {
+    if (!confirm("Are you sure you want to suspend this user?")) return;
+    try {
+      await fetch(`${BASE}/api/admin/users/${userId}/suspend`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: "SUSPENDED" }),
+      });
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: "SUSPENDED" } : u));
+    } catch { alert("Failed to suspend user."); }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    if (!confirm("Are you sure you want to permanently delete this user? This cannot be undone.")) return;
+    try {
+      await fetch(`${BASE}/api/admin/users/${userId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(prev => prev.filter(u => u.id !== userId));
+    } catch { alert("Failed to delete user."); }
+  };
+
+  const handleReinstateUser = async (userId: number) => {
+    try {
+      await fetch(`${BASE}/api/admin/users/${userId}/suspend`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: "ACTIVE" }),
+      });
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: "ACTIVE" } : u));
+    } catch { alert("Failed to reinstate user."); }
+  };
+
+  const filteredUsers = users.filter(u =>
+    u.username?.toLowerCase().includes(userSearch.toLowerCase()) ||
+    u.email?.toLowerCase().includes(userSearch.toLowerCase())
+  );
+
   return (
     <main className="min-h-screen bg-gray-50">
       <nav className="bg-gray-900 px-6 py-4 flex items-center justify-between">
@@ -116,7 +157,7 @@ export default function AdminDashboardPage() {
           ))}
         </div>
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-fit flex-wrap">
-          {(["overview","therapists","moderation","taxonomy"] as const).map(tab => (
+          {(["overview","therapists","moderation","taxonomy","users"] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-colors ${activeTab===tab?"bg-white text-gray-900 shadow-sm":"text-gray-500 hover:text-gray-700"}`}>
               {tab}{tab==="moderation"&&pendingReports>0&&<span className="ml-1.5 px-1.5 py-0.5 bg-yellow-400 text-white text-xs rounded-full">{pendingReports}</span>}
             </button>
@@ -193,6 +234,129 @@ export default function AdminDashboardPage() {
                 {report.status==="PENDING"&&<div className="flex gap-2 mt-4"><button onClick={() => handleReportAction(report.reportId,"ACTION_TAKEN")} className="px-4 py-1.5 bg-red-500 text-white text-xs rounded-full font-semibold hover:bg-red-600">Take Action</button><button onClick={() => handleReportAction(report.reportId,"DISMISSED")} className="px-4 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-full font-semibold hover:bg-gray-50">Dismiss</button></div>}
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === "users" && (
+          <div className="space-y-5">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h2 className="font-bold text-gray-900">User Management</h2>
+                  <p className="text-sm text-gray-500 mt-0.5">View, suspend, or remove community members</p>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                  <svg width="14" height="14" fill="none" stroke="#9CA3AF" strokeWidth="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                  </svg>
+                  <input
+                    type="text" value={userSearch} onChange={e => setUserSearch(e.target.value)}
+                    placeholder="Search by name or email..."
+                    className="bg-transparent text-sm focus:outline-none text-gray-700 w-48"
+                  />
+                </div>
+              </div>
+
+              {filteredUsers.length === 0 ? (
+                <div className="text-center py-10">
+                  <p className="text-gray-400 text-sm">
+                    {users.length === 0 ? "No users found. Connect the backend to load user data." : "No users match your search."}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredUsers.map(user => (
+                    <div key={user.id} className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-gray-600 font-bold text-sm">
+                          {user.username?.[0]?.toUpperCase() || "U"}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-900 truncate">{user.username || "Unknown"}</p>
+                          {user.reportCount && user.reportCount > 0 && (
+                            <span className="px-2 py-0.5 bg-red-50 text-red-600 text-xs font-semibold rounded-full">
+                              {user.reportCount} report{user.reportCount > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                        <p className="text-xs text-gray-400">
+                          Joined {new Date(user.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          user.status === "ACTIVE" ? "bg-green-100 text-green-700" :
+                          user.status === "SUSPENDED" ? "bg-red-100 text-red-600" :
+                          "bg-gray-100 text-gray-500"
+                        }`}>
+                          {user.status}
+                        </span>
+                        {user.status === "ACTIVE" ? (
+                          <button
+                            onClick={() => handleSuspendUser(user.id)}
+                            className="px-3 py-1.5 border border-yellow-200 text-yellow-600 text-xs rounded-full font-semibold hover:bg-yellow-50 transition-colors"
+                          >
+                            Suspend
+                          </button>
+                        ) : user.status === "SUSPENDED" ? (
+                          <button
+                            onClick={() => handleReinstateUser(user.id)}
+                            className="px-3 py-1.5 border border-green-200 text-green-600 text-xs rounded-full font-semibold hover:bg-green-50 transition-colors"
+                          >
+                            Reinstate
+                          </button>
+                        ) : null}
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="px-3 py-1.5 border border-red-200 text-red-500 text-xs rounded-full font-semibold hover:bg-red-50 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Reported users quick view */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <h2 className="font-bold text-gray-900 mb-4">Users with Pending Reports</h2>
+              {reports.filter(r => r.status === "PENDING").length === 0 ? (
+                <p className="text-sm text-gray-400">No pending reports at this time.</p>
+              ) : (
+                <div className="space-y-3">
+                  {reports.filter(r => r.status === "PENDING").map(report => (
+                    <div key={report.id} className="flex items-start gap-4 p-4 border border-red-100 bg-red-50 rounded-xl">
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 text-sm">{report.storyTitle}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          <span className="font-medium">Reported by:</span> {report.reporterName}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1 bg-white rounded-lg px-3 py-1.5">{report.reason}</p>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => handleReport(report.id, "ACTION_TAKEN")}
+                          className="px-3 py-1.5 bg-red-500 text-white text-xs rounded-full font-semibold hover:bg-red-600"
+                        >
+                          Take Action
+                        </button>
+                        <button
+                          onClick={() => handleReport(report.id, "DISMISSED")}
+                          className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-full font-semibold hover:bg-gray-50"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

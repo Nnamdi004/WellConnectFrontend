@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"EXIT:$?\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\User\\OneDrive\\Desktop\\WellConnectFrontend\\.claude"
+    ]
+  }
+}

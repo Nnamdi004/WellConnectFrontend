@@ -17,5 +17,4 @@ Thumbs.db
 # Debug logs
 npm-debug.log*
 
-# Permission files
-.claude/
+

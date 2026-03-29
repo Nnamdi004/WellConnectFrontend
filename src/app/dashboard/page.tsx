@@ -22,7 +22,7 @@ export default function DashboardPage() {
     const token = localStorage.getItem("token") || "";
     setIsLoggedIn(!!token);
     if (token) {
-      fetch(`${BASE}/api/mood/history`, { headers: { Authorization: `Bearer ${token}` } })
+      fetch(`${BASE}/api/moods`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json()).then(setMoodLogs).catch(() => {});
       fetch(`${BASE}/api/appointments`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json()).then(setAppointments).catch(() => {});
@@ -35,7 +35,7 @@ export default function DashboardPage() {
     setSaving(true);
     const moodLabel = sliderValue <= 3 ? "Low" : sliderValue <= 6 ? "Neutral" : sliderValue <= 8 ? "Good" : "Excellent";
     try {
-      await fetch(`${BASE}/api/mood`, {
+      await fetch(`${BASE}/api/moods`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ moodLabel, moodScore: sliderValue, notes: journalNote }),
@@ -43,7 +43,7 @@ export default function DashboardPage() {
       setSaveSuccess(true);
       setJournalNote("");
       setTimeout(() => setSaveSuccess(false), 3000);
-      fetch(`${BASE}/api/mood/history`, { headers: { Authorization: `Bearer ${token}` } })
+      fetch(`${BASE}/api/moods`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json()).then(setMoodLogs).catch(() => {});
     } catch {}
     finally { setSaving(false); }

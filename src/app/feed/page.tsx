@@ -53,7 +53,7 @@ export default function FeedPage() {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
 
   useEffect(() => {
-    fetch(`${BASE}/api/stories/feed`)
+    fetch(`${BASE}/api/stories`)
       .then(r => r.json()).then(setStories).catch(() => setStories([]))
       .finally(() => setLoading(false));
   }, [BASE]);

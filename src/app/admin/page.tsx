@@ -84,8 +84,8 @@ export default function AdminDashboardPage() {
       .then(r => r.json())
       .then(data => setReports(Array.isArray(data) && data.length > 0 ? data : DEMO_REPORTS))
       .catch(() => setReports(DEMO_REPORTS));
-    fetch(`${BASE}/api/stories/categories`).then(r => r.json()).then(setCategories).catch(() => {});
-    fetch(`${BASE}/api/stories/tags`).then(r => r.json()).then(setTags).catch(() => {});
+    fetch(`${BASE}/api/categories`).then(r => r.json()).then(setCategories).catch(() => {});
+    fetch(`${BASE}/api/tags`).then(r => r.json()).then(setTags).catch(() => {});
     fetch(`${BASE}/api/admin/users`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json()).then(setUsers).catch(() => {});
   }, [BASE, token]);
@@ -109,8 +109,8 @@ export default function AdminDashboardPage() {
 
   const handleReportAction = async (reportId: number, action: "DISMISSED" | "ACTION_TAKEN") => {
     try {
-      await fetch(`${BASE}/api/admin/reports/${reportId}/status`, {
-        method: "PATCH",
+      await fetch(`${BASE}/api/admin/reports/${reportId}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: action }),
       });

@@ -16,11 +16,11 @@ export default function TherapistPortalPage() {
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081";
   const token = typeof window !== "undefined" ? localStorage.getItem("therapist_token") || "" : "";
 
   useEffect(() => {
-    fetch(`${BASE}/api/therapist/appointments`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setAppointments).catch(() => {});
+    fetch(`${BASE}/api/therapists/appointments`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setAppointments).catch(() => {});
     fetch(`${BASE}/api/therapist/clients`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setClients).catch(() => {});
   }, [BASE, token]);
 

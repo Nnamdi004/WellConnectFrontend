@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { therapistService } from "@/services/therapistService";
+import { chatService } from "@/services/chatService";
 
 type Appointment = { id: number; userName: string; scheduledAt: string; status: string; sessionType: string; notes?: string };
 type Client = { id: number; name: string; lastSession?: string; moodTrend?: number };
@@ -20,7 +22,7 @@ export default function TherapistPortalPage() {
   const token = typeof window !== "undefined" ? localStorage.getItem("therapist_token") || "" : "";
 
   useEffect(() => {
-    fetch(`${BASE}/api/therapists/appointments`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setAppointments).catch(() => {});
+    therapistService.getAppointments(token).then(r => setAppointments(r.data)).catch(() => {});
     fetch(`${BASE}/api/therapist/clients`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setClients).catch(() => {});
   }, [BASE, token]);
 
@@ -37,11 +39,11 @@ export default function TherapistPortalPage() {
     setActiveSession({ id: sessionId, userName });
     setActiveTab("messages");
     try {
-      const r = await fetch(`${BASE}/api/chat/sessions/${sessionId}/messages`, { headers: { Authorization: `Bearer ${token}` } });
-      setChatMessages(await r.json());
+      const r = await chatService.getMessages(sessionId);
+      setChatMessages(r.data);
     } catch { setChatMessages([]); }
     if (wsRef.current) wsRef.current.close();
-    const ws = new WebSocket(`${BASE.replace("http", "ws")}/ws/chat/${sessionId}?token=${token}`);
+    const ws = chatService.createWebSocket(sessionId, token);
     ws.onmessage = (e) => setChatMessages(prev => [...prev, JSON.parse(e.data)]);
     wsRef.current = ws;
   };

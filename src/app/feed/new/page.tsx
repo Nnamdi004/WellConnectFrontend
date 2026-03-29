@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { storyService } from "@/services/storyService";
 
 type Tag = { id: number; name: string };
 
@@ -35,9 +36,8 @@ export default function NewStoryPage() {
     e.preventDefault();
     if (!categoryId) { setError("Please select a category."); return; }
     setError(""); setLoading(true);
-    const token = localStorage.getItem("token") || "";
     try {
-      await fetch(`${BASE}/api/stories`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ title, content, categoryId, tagIds: selectedTags, isAnonymous }) });
+      await storyService.create({ title, content, categoryId, tagIds: selectedTags, isAnonymous });
       setSuccess(true);
     } catch { setError("Could not publish. Please sign in and try again."); }
     finally { setLoading(false); }

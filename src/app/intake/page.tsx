@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { intakeService } from "@/services/intakeService";
 
 const PHQ9 = ["Little interest or pleasure in doing things","Feeling down, depressed, or hopeless","Trouble falling or staying asleep, or sleeping too much","Feeling tired or having little energy","Poor appetite or overeating","Feeling bad about yourself or that you are a failure","Trouble concentrating on things","Moving or speaking so slowly others noticed, or being fidgety and restless","Thoughts that you would be better off dead or of hurting yourself"];
 const GAD7 = ["Feeling nervous, anxious, or on edge","Not being able to stop or control worrying","Worrying too much about different things","Trouble relaxing","Being so restless that it is hard to sit still","Becoming easily annoyed or irritable","Feeling afraid as if something awful might happen"];
@@ -34,13 +35,7 @@ export default function IntakePage() {
   const submit = async () => {
     setSubmitting(true);
     try {
-      const token = localStorage.getItem("token") || "";
-      // Backend expects only phq9Score and gad7Score — it calculates severity itself
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081"}/api/intake`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ phq9Score, gad7Score })
-      });
+      await intakeService.submit(phq9Score, gad7Score);
     } catch { } finally { setSubmitting(false); setStep("results"); }
   };
 

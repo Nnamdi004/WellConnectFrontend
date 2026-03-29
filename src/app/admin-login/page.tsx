@@ -30,23 +30,13 @@ export default function AdminLoginPage() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081"}/api/auth/admin/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-      if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "Invalid credentials.");
-      }
-      const data = await res.json();
+      const res = await (await import("@/services/authService")).authService.adminLogin(email, password);
+      const data = res.data;
       localStorage.setItem("admin_token", data.token);
       window.location.href = "/admin";
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed. Please check your credentials.");
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setError(axiosErr.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }

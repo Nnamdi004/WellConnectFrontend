@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
+import BackendWakeUp from "@/components/BackendWakeUp";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -29,7 +31,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning={true}>{children}</body>
+      <body suppressHydrationWarning={true}>
+        <AuthProvider>
+          <BackendWakeUp />
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }

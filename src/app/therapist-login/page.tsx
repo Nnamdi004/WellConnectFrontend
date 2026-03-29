@@ -30,23 +30,13 @@ export default function TherapistLoginPage() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081"}/api/auth/therapist/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-      if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "Login failed. Your account may be inactive or suspended.");
-      }
-      const data = await res.json();
+      const res = await (await import("@/services/authService")).authService.therapistLogin(email, password);
+      const data = res.data;
       localStorage.setItem("therapist_token", data.token);
       window.location.href = "/therapist";
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed.");
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setError(axiosErr.response?.data?.message || "Login failed. Your account may be inactive or suspended.");
     } finally {
       setLoading(false);
     }

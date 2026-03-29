@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { Phone, Video, X, ArrowLeft, Send, Activity } from "lucide-react";
+import { chatService } from "@/services/chatService";
 
 type Message = { id: number; messageText: string; senderType: "USER" | "THERAPIST"; timestamp: string };
 type Session = { id: number; therapistName: string; status: string; moodBefore?: string };
@@ -71,12 +72,12 @@ export default function MessagesPage() {
     }
 
     try {
-      const r = await fetch(`${BASE}/api/chat/sessions/${session.id}/messages`, { headers: { Authorization: `Bearer ${token}` } });
-      setMessages(await r.json());
+      const r = await chatService.getMessages(session.id);
+      setMessages(r.data);
     } catch { setMessages([]); }
 
     if (wsRef.current) wsRef.current.close();
-    const ws = new WebSocket(`${BASE.replace("http", "ws")}/ws/chat/${session.id}?token=${token}`);
+    const ws = chatService.createWebSocket(session.id, token);
     ws.onmessage = (e) => setMessages(prev => [...prev, JSON.parse(e.data)]);
     wsRef.current = ws;
   };
@@ -85,11 +86,7 @@ export default function MessagesPage() {
     if (!activeSession) return;
     if (!isDemoSession) {
       try {
-        await fetch(`${BASE}/api/chat/sessions/${activeSession.id}/mood`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ moodBefore: String(moodSlider) }),
-        });
+        await chatService.updateMood(activeSession.id, { moodBefore: String(moodSlider) });
       } catch {}
     }
     setActiveSession(prev => prev ? { ...prev, moodBefore: String(moodSlider) } : prev);
@@ -98,11 +95,11 @@ export default function MessagesPage() {
       setMessages(DEMO_MESSAGES);
     } else {
       try {
-        const r = await fetch(`${BASE}/api/chat/sessions/${activeSession.id}/messages`, { headers: { Authorization: `Bearer ${token}` } });
-        setMessages(await r.json());
+        const r = await chatService.getMessages(activeSession.id);
+        setMessages(r.data);
       } catch { setMessages([]); }
       if (wsRef.current) wsRef.current.close();
-      const ws = new WebSocket(`${BASE.replace("http", "ws")}/ws/chat/${activeSession.id}?token=${token}`);
+      const ws = chatService.createWebSocket(activeSession.id, token);
       ws.onmessage = (e) => setMessages(prev => [...prev, JSON.parse(e.data)]);
       wsRef.current = ws;
     }
@@ -113,11 +110,7 @@ export default function MessagesPage() {
     if (!activeSession) return;
     if (!isDemoSession) {
       try {
-        await fetch(`${BASE}/api/chat/sessions/${activeSession.id}/mood`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ moodAfter: String(moodSlider) }),
-        });
+        await chatService.updateMood(activeSession.id, { moodAfter: String(moodSlider) });
       } catch {}
     }
     if (wsRef.current) wsRef.current.close();
@@ -139,11 +132,7 @@ export default function MessagesPage() {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
           wsRef.current.send(JSON.stringify({ messageText: text, senderType: "USER" }));
         } else {
-          await fetch(`${BASE}/api/chat/sessions/${activeSession.id}/messages`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ messageText: text, senderType: "USER" }),
-          });
+          await chatService.sendMessage(activeSession.id, text, "USER");
         }
       } catch {}
     }

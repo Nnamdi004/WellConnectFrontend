@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { moodService } from "@/services/moodService";
 
 type MoodLog = { id: number; moodLabel: string; moodScore: number; notes: string; loggedAt: string };
 type Appointment = { id: number; therapistName: string; scheduledAt: string; status: string };
@@ -22,8 +23,7 @@ export default function DashboardPage() {
     const token = localStorage.getItem("token") || "";
     setIsLoggedIn(!!token);
     if (token) {
-      fetch(`${BASE}/api/moods`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json()).then(setMoodLogs).catch(() => {});
+      moodService.getHistory().then(r => setMoodLogs(r.data)).catch(() => {});
       fetch(`${BASE}/api/appointments`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json()).then(setAppointments).catch(() => {});
     }
@@ -35,16 +35,11 @@ export default function DashboardPage() {
     setSaving(true);
     const moodLabel = sliderValue <= 3 ? "Low" : sliderValue <= 6 ? "Neutral" : sliderValue <= 8 ? "Good" : "Excellent";
     try {
-      await fetch(`${BASE}/api/moods`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ moodLabel, moodScore: sliderValue, notes: journalNote }),
-      });
+      await moodService.log({ moodLabel, moodScore: sliderValue, notes: journalNote });
       setSaveSuccess(true);
       setJournalNote("");
       setTimeout(() => setSaveSuccess(false), 3000);
-      fetch(`${BASE}/api/moods`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json()).then(setMoodLogs).catch(() => {});
+      moodService.getHistory().then(r => setMoodLogs(r.data)).catch(() => {});
     } catch {}
     finally { setSaving(false); }
   };

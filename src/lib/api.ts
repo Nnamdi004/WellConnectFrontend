@@ -1,4 +1,32 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Attach JWT token to every request automatically
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// Handle 401 (expired token) globally
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(err);
+  }
+);
+
+export default api;
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/api$/, "") || "http://localhost:8081";
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
 

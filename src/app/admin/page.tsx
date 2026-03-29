@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { registerTherapist, getAllTherapists, updateTherapist, deleteTherapist } from "@/lib/api";
+import { adminService } from "@/services/adminService";
 import { AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronUp, Clock, ShieldAlert } from "lucide-react";
 
 type Therapist = { therapistId: number; fullName: string; email: string; specialisation: string; status: string; createdAt: string };
@@ -79,7 +79,7 @@ export default function AdminDashboardPage() {
   const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") || "" : "";
 
   useEffect(() => {
-    getAllTherapists(token).then(setTherapists).catch(() => {});
+    adminService.getAllTherapists().then(r => setTherapists(r.data)).catch(() => {});
     fetch(`${BASE}/api/admin/reports`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => setReports(Array.isArray(data) && data.length > 0 ? data : DEMO_REPORTS))
@@ -95,7 +95,8 @@ export default function AdminDashboardPage() {
     setProvisioning(true);
     setProvisionError("");
     try {
-      const created = await registerTherapist(newTherapist, token);
+      const res = await adminService.registerTherapist(newTherapist);
+      const created = res.data;
       setTherapists(prev => [...prev, created]);
       setNewTherapist({ fullName: "", email: "", specialisation: "", password: "" });
       setProvisionSuccess(true);
@@ -109,11 +110,7 @@ export default function AdminDashboardPage() {
 
   const handleReportAction = async (reportId: number, action: "DISMISSED" | "ACTION_TAKEN") => {
     try {
-      await fetch(`${BASE}/api/admin/reports/${reportId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: action }),
-      });
+      await adminService.updateReport(reportId, action);
       setReports(prev => prev.map(r => r.reportId === reportId ? { ...r, status: action } : r));
       setExpandedReport(null);
     } catch {
@@ -126,9 +123,8 @@ export default function AdminDashboardPage() {
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
     try {
-      const res = await fetch(`${BASE}/api/admin/categories`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ name: newCategoryName }) });
-      const newCat = await res.json();
-      setCategories(prev => [...prev, newCat]);
+      const r = await adminService.createCategory(newCategoryName);
+      setCategories(prev => [...prev, r.data]);
       setNewCategoryName("");
     } catch { alert("Failed to add category."); }
   };
@@ -136,37 +132,36 @@ export default function AdminDashboardPage() {
   const handleAddTag = async () => {
     if (!newTagName.trim()) return;
     try {
-      const res = await fetch(`${BASE}/api/admin/tags`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ name: newTagName }) });
-      const newTag = await res.json();
-      setTags(prev => [...prev, newTag]);
+      const r = await adminService.createTag(newTagName);
+      setTags(prev => [...prev, r.data]);
       setNewTagName("");
     } catch { alert("Failed to add tag."); }
   };
 
   const handleDeleteCategory = async (id: number) => {
     try {
-      await fetch(`${BASE}/api/admin/categories/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      await adminService.deleteCategory(id);
       setCategories(prev => prev.filter(c => c.categoryId !== id));
     } catch { alert("Failed."); }
   };
 
   const handleDeleteTag = async (id: number) => {
     try {
-      await fetch(`${BASE}/api/admin/tags/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      await adminService.deleteTag(id);
       setTags(prev => prev.filter(t => t.tagId !== id));
     } catch { alert("Failed."); }
   };
 
   const handleSuspendTherapist = async (id: number) => {
     try {
-      await updateTherapist(id, { status: "SUSPENDED" }, token);
+      await adminService.updateTherapist(id, { status: "SUSPENDED" });
       setTherapists(prev => prev.map(t => t.therapistId === id ? { ...t, status: "SUSPENDED" } : t));
     } catch { alert("Failed to suspend therapist."); }
   };
 
   const handleDeleteTherapist = async (id: number) => {
     try {
-      await deleteTherapist(id, token);
+      await adminService.deleteTherapist(id);
       setTherapists(prev => prev.filter(t => t.therapistId !== id));
     } catch { alert("Failed to delete therapist."); }
   };
@@ -174,11 +169,7 @@ export default function AdminDashboardPage() {
   const handleSuspendUser = async (userId: number) => {
     if (!confirm("Are you sure you want to suspend this user?")) return;
     try {
-      await fetch(`${BASE}/api/admin/users/${userId}/suspend`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: "SUSPENDED" }),
-      });
+      await adminService.suspendUser(userId);
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: "SUSPENDED" } : u));
     } catch { alert("Failed to suspend user."); }
   };
@@ -186,21 +177,14 @@ export default function AdminDashboardPage() {
   const handleDeleteUser = async (userId: number) => {
     if (!confirm("Are you sure you want to permanently delete this user? This cannot be undone.")) return;
     try {
-      await fetch(`${BASE}/api/admin/users/${userId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await adminService.deleteUser(userId);
       setUsers(prev => prev.filter(u => u.id !== userId));
     } catch { alert("Failed to delete user."); }
   };
 
   const handleReinstateUser = async (userId: number) => {
     try {
-      await fetch(`${BASE}/api/admin/users/${userId}/suspend`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: "ACTIVE" }),
-      });
+      await adminService.reinstateUser(userId);
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: "ACTIVE" } : u));
     } catch { alert("Failed to reinstate user."); }
   };

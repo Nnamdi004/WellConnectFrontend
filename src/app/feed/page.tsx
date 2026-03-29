@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { storyService } from "@/services/storyService";
+import { reportService } from "@/services/reportService";
 
 type Story = {
   storyId: number;
@@ -53,8 +55,8 @@ export default function FeedPage() {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
 
   useEffect(() => {
-    fetch(`${BASE}/api/stories`)
-      .then(r => r.json()).then(setStories).catch(() => setStories([]))
+    storyService.getFeed()
+      .then(r => setStories(r.data)).catch(() => setStories([]))
       .finally(() => setLoading(false));
   }, [BASE]);
 
@@ -95,11 +97,7 @@ export default function FeedPage() {
     setReportSubmitting(true);
     const reason = reportReason === "Other" ? customReason : reportReason;
     try {
-      await fetch(`${BASE}/api/stories/${reportingStoryId}/report`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ reason }),
-      });
+      await reportService.submit({ storyId: reportingStoryId, reason });
       setReportSuccess(true);
       setTimeout(() => setReportingStoryId(null), 1800);
     } catch {}

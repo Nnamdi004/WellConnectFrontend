@@ -102,7 +102,8 @@ export default function AdminDashboardPage() {
       setProvisionSuccess(true);
       setTimeout(() => setProvisionSuccess(false), 3000);
     } catch (err: unknown) {
-      setProvisionError(err instanceof Error ? err.message : "Failed to create account.");
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setProvisionError(axiosErr.response?.data?.message || "Failed to create account.");
     } finally {
       setProvisioning(false);
     }

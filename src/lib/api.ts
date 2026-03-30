@@ -5,9 +5,23 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Attach JWT token to every request automatically
+// Attach the correct JWT token based on the endpoint being called
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const url = config.url || "";
+  const adminToken = localStorage.getItem("admin_token");
+  const therapistToken = localStorage.getItem("therapist_token");
+  const userToken = localStorage.getItem("token");
+
+  let token: string | null;
+  if (url.startsWith("/admin") && adminToken) {
+    token = adminToken;
+  } else if ((url.startsWith("/therapists") || url.startsWith("/chat")) && therapistToken) {
+    token = therapistToken;
+  } else {
+    // Fall back through available tokens
+    token = userToken || therapistToken || adminToken;
+  }
+
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });

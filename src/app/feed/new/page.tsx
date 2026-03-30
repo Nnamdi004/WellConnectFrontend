@@ -5,15 +5,7 @@ import { storyService } from "@/services/storyService";
 import { categoryService } from "@/services/categoryService";
 
 type Tag = { id: number; name: string };
-
-const CATEGORIES = [
-  { id: 1, name: "Anxiety" },
-  { id: 2, name: "Depression" },
-  { id: 3, name: "Grief & Loss" },
-  { id: 4, name: "Trauma & PTSD" },
-  { id: 5, name: "Stress & Burnout" },
-  { id: 6, name: "Relationships" },
-];
+type Category = { id: number; categoryId?: number; name: string };
 
 export default function NewStoryPage() {
   const [title, setTitle] = useState("");
@@ -21,11 +13,18 @@ export default function NewStoryPage() {
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [isAnonymous, setIsAnonymous] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
   useEffect(() => {
+    categoryService.getAll().then(r => {
+      const data: Category[] = r.data;
+      // backend may return categoryId or id
+      setCategories(data.map(c => ({ ...c, id: c.categoryId ?? c.id })));
+    }).catch(() => {});
     categoryService.getTags().then(r => setTags(r.data)).catch(() => {});
   }, []);
 
@@ -36,7 +35,7 @@ export default function NewStoryPage() {
     if (!categoryId) { setError("Please select a category."); return; }
     setError(""); setLoading(true);
     try {
-      await storyService.create({ title, content, categoryId, tagIds: selectedTags, isAnonymous });
+      await storyService.create({ title, content, categoryId, tagIds: selectedTags, isAnonymous, visibility: "PUBLIC" });
       setSuccess(true);
     } catch { setError("Could not publish. Please sign in and try again."); }
     finally { setLoading(false); }
@@ -85,7 +84,7 @@ export default function NewStoryPage() {
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#10B981] bg-gray-50 text-gray-700"
             >
               <option value="" disabled>Select a mental health topic...</option>
-              {CATEGORIES.map(c => (
+              {categories.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>

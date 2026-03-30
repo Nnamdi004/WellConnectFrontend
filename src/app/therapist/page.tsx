@@ -53,9 +53,9 @@ export default function TherapistPortalPage() {
     setSending(true);
     try {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({ content: newMessage, senderType: "THERAPIST" }));
+        wsRef.current.send(JSON.stringify({ messageText: newMessage, senderType: "THERAPIST" }));
       } else {
-        await fetch(`${BASE}/api/chat/sessions/${activeSession.id}/messages`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ content: newMessage, senderType: "THERAPIST" }) });
+        await chatService.sendMessage(activeSession.id, newMessage, "THERAPIST");
         setChatMessages(prev => [...prev, { id: Date.now(), content: newMessage, senderType: "THERAPIST", sentAt: new Date().toISOString() }]);
       }
       setNewMessage("");

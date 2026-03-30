@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { storyService } from "@/services/storyService";
+import { categoryService } from "@/services/categoryService";
 
 type Tag = { id: number; name: string };
 
@@ -24,11 +25,9 @@ export default function NewStoryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081";
-
   useEffect(() => {
-    fetch(`${BASE}/api/stories/tags`).then(r => r.json()).then(setTags).catch(() => {});
-  }, [BASE]);
+    categoryService.getTags().then(r => setTags(r.data)).catch(() => {});
+  }, []);
 
   const toggleTag = (id: number) => setSelectedTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
 

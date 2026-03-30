@@ -435,7 +435,7 @@ export const getTherapistAvailability = async (id: number) => {
 // Receive: { id, messageText, senderType, timestamp }
 
 export const createWebSocket = (sessionId: number, token: string): WebSocket => {
-  const wsBase = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace("http", "ws");
+  const wsBase = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8081";
   return new WebSocket(`${wsBase}/ws/chat/${sessionId}?token=${token}`);
 };
 
